@@ -90,7 +90,7 @@ void benchmark_sorting() {
     
     if (results_file != NULL) {
         fclose(results_file);
-        printf("\n📊 Результаты сохранены в файл results.txt\n");
+        printf("\n  Результаты сохранены в файл results.txt\n");
         printf("   Для построения графика будет использован этот файл.\n");
     }
     
