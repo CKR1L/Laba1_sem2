@@ -1,4 +1,3 @@
-# Минимальный Makefile
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99
 TARGET = sort_program

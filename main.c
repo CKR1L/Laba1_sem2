@@ -43,7 +43,7 @@ int* input_array_dynamic(int* size) {
                 continue;
             }
             
-            printf("Ошибка: обнаружен недопустимый символ '%c' в позиции %d\n", line[i], i + 1);
+            printf("Ошибка: обнаружен недопустимый символ в \n");
             printf("Вводите только целые числа и пробелы!\n");
             return NULL;
         }
