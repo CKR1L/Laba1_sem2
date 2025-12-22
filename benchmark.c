@@ -6,9 +6,9 @@
 #include "file.h"
 
 void benchmark_sorting() {
-    printf("═══════════════════════════════════════════════════════════\n");
+    printf("===========================================================\n");
     printf("          ТЕСТИРОВАНИЕ ПРОИЗВОДИТЕЛЬНОСТИ СОРТИРОВОК      \n");
-    printf("═══════════════════════════════════════════════════════════\n\n");
+    printf("===========================================================\n");
     
     int sizes[] = {100, 500, 1000, 5000, 10000};
     int num_sizes = sizeof(sizes) / sizeof(sizes[0]);
@@ -17,7 +17,6 @@ void benchmark_sorting() {
     printf("│   Размер     │  Сорт. выбором (с)   │ Быстрая сорт. (с)    │ Ускорение│\n");
     printf("├──────────────┼──────────────────────┼──────────────────────┼──────────┤\n");
     
-    // Открываем файл для сохранения результатов
     FILE* results_file = fopen("results.txt", "w");
     if (results_file != NULL) {
         fprintf(results_file, "Size Selection Quick\n");
@@ -53,32 +52,29 @@ void benchmark_sorting() {
             continue;
         }
         
-        // Копируем массивы
         for (int j = 0; j < size; j++) {
             arr_selection[j] = arr[j];
             arr_quick[j] = arr[j];
         }
         
-        // Сортировка выбором
         clock_t start = clock();
         selection_sort(arr_selection, size);
         clock_t end = clock();
-        double selection_time = ((double)(end - start)) / CLOCKS_PER_SEC; // в секундах
+        double selection_time = ((double)(end - start)) / CLOCKS_PER_SEC; 
         
-        // Быстрая сортировка
         start = clock();
         quick_sort(arr_quick, 0, size - 1);
         end = clock();
-        double quick_time = ((double)(end - start)) / CLOCKS_PER_SEC; // в секундах
+        double quick_time = ((double)(end - start)) / CLOCKS_PER_SEC; 
         
         double speedup = (quick_time > 0) ? selection_time / quick_time : 0;
         
-        printf("%18.2f │ %18.2f │  x%5.1f │\n", 
+        printf("%10.6f │ %10.6f │  x%5.3f │\n", 
                selection_time, quick_time, speedup);
         
-        // Сохраняем результаты в файл
+        
         if (results_file != NULL) {
-            fprintf(results_file, "%d %.2f %.2f\n", sizes[i], selection_time, quick_time);
+            fprintf(results_file, "%d %.6f %.6f\n", sizes[i], selection_time, quick_time);
         }
         
         free(arr);
@@ -94,9 +90,9 @@ void benchmark_sorting() {
         printf("   Для построения графика будет использован этот файл.\n");
     }
     
-    printf("\n═══════════════════════════════════════════════════════════\n");
+    printf("\n=========================================================\n");
     printf("                       ВЫВОДЫ:                             \n");
-    printf("═══════════════════════════════════════════════════════════\n\n");
+    printf("===========================================================\n");
     
     printf("1. Быстрая сортировка значительно быстрее при больших объемах данных\n");
     printf("2. Сортировка выбором эффективна только для небольших массивов\n");
