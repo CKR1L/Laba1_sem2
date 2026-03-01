@@ -14,10 +14,10 @@ Matrix* create_matrix(int line, int column, int type){
     }
     for(int i = 0; i < line; i++){
         if(type == 0){
-            mat -> data[i] = (int*)malloc(line * sizeof(int));
+            mat -> data[i] = (int*)malloc(column * sizeof(int));
         }
         else {
-            mat -> data[i] = (float*)malloc(line * sizeof(float));
+            mat -> data[i] = (float*)malloc(column * sizeof(float));
         }
         if(!mat -> data[i]){
             for(int j = 0; j < i; j++){
@@ -31,7 +31,7 @@ Matrix* create_matrix(int line, int column, int type){
     return mat; 
 }
 void free_matrix(Matrix*mat){
-    if(!mat -> data) return 0;
+    if(!mat -> data) return;
     for(int i = 0; i < mat -> line; i++){
         if(mat -> data[i]){
             free(mat -> data[i]);
@@ -41,10 +41,10 @@ void free_matrix(Matrix*mat){
     free(mat);   
 }
 void input_matrix(Matrix*mat){
-    if(!mat) return 0;
+    if(!mat) return;
     printf("Введите элементы матрицы размера (%d * %d):\n", mat -> line, mat -> column );
     for (int i = 0; i < mat -> line; i++){
-        for (int j = 0; i < mat -> column; i++){
+        for (int j = 0; j < mat -> column; j++){
             if (mat -> type == 0){
                 printf("mat[%d][%d] int: ", i, j);
                 scanf("%d", &((int**)mat -> data)[i][j]);
@@ -60,9 +60,9 @@ int check_type_matrix(Matrix*a, Matrix*b){
     return a -> type == b -> type;
 }
 void print_matrix(Matrix*mat){
-    if(!mat) return 0;
+    if(!mat) return;
     for (int i = 0; i < mat -> line; i++){
-        for (int j = 0; i < mat -> column; i++){
+        for (int j = 0; j < mat -> column; j++){
             if(mat -> type == 0){
                 printf("%d", ((int**)mat -> data)[i][j]);
             }else{
@@ -117,7 +117,7 @@ Matrix* multiplication_matrices(Matrix*a, Matrix*b){
             }else{
                 ((float**)result -> data)[i][j] = 0.0;
                 for (int k = 0; k < a -> column; k++){
-                    ((float**)result -> data)[i][j] += ((float**)a -> column)[i][k] * ((float**)b -> column)[k][j];
+                    ((float**)result -> data)[i][j] += ((float**)a -> data)[i][k] * ((float**)b -> data)[k][j];
                 }
             }
         }
@@ -129,9 +129,9 @@ Matrix*transposition_matrix(Matrix*mat){
     for (int i = 0; i < mat -> line; i++){
         for (int j = 0; j < mat -> column; j++){
             if (mat -> type == 0){
-                ((int**)result -> data)[j][i] == ((int**)mat -> data)[i][j];
+                ((int**)result -> data)[j][i] = ((int**)mat -> data)[i][j];
             }else{
-                ((float**)result -> data)[j][i] == ((float**)mat -> data)[i][j];
+                ((float**)result -> data)[j][i] = ((float**)mat -> data)[i][j];
             }
         }
     }

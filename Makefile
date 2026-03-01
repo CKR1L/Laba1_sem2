@@ -1,21 +1,14 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -std=c99
-TARGET = sort_program
-SRCS = main.c queue.c sorting.c file.c benchmark.c
-OBJS = $(SRCS:.c=.o)
-
+TARGET = ./a.out
+FILES = main.o matrix.o menu.o
+compile: *.c
+		gcc main.c matrix.c menu.c -g -o main
+.PHONY: all clean install unistall
 all: $(TARGET)
-
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
-
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-run: $(TARGET)
-	./$(TARGET)
-
-clean:
-	rm -f $(OBJS) $(TARGET)
-
-.PHONY: all run clean
+run: compile
+	./main
+main.o: main.c
+	gcc -c -o main.o main.c
+matrix.o: matrix.c
+	gcc -c -o matrix.o matrix.c
+menu.o: menu.c
+	gcc -c -o menu.o menu.c
