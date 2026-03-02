@@ -66,7 +66,7 @@ void print_matrix(Matrix*mat){
             if(mat -> type == 0){
                 printf("%d", ((int**)mat -> data)[i][j]);
             }else{
-                printf("%f", ((float**)mat -> data)[i][j]);
+                printf("%.2f", ((float**)mat -> data)[i][j]);
             }
         }
         printf("\n");
@@ -79,9 +79,11 @@ Matrix* add_matrices(Matrix*a, Matrix*b){
     }
     if((a -> line != b -> line)|| (a ->column != b->column)){
         printf("Размерность матриц не совпадает (необходимое условие для сложения)!");
+        return 0;
     }
     if(!check_type_matrix(a, b)){
         printf("Ошибка! Матрицы должны быть одного типа (необходимое условие для сложения)!");
+        return 0;
     }
     Matrix*result = create_matrix(a -> line, a -> column, a -> type);
     if(!result) return 0;
