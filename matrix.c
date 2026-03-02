@@ -62,14 +62,15 @@ int check_type_matrix(Matrix*a, Matrix*b){
 void print_matrix(Matrix*mat){
     if(!mat) return;
     for (int i = 0; i < mat -> line; i++){
+        printf("|");
         for (int j = 0; j < mat -> column; j++){
             if(mat -> type == 0){
-                printf("%d", ((int**)mat -> data)[i][j]);
+                printf("%d ", ((int**)mat -> data)[i][j]);
             }else{
-                printf("%.2f", ((float**)mat -> data)[i][j]);
+                printf("%.2f ", ((float**)mat -> data)[i][j]);
             }
         }
-        printf("\n");
+        printf("|\n");
     }
 }
 Matrix* add_matrices(Matrix*a, Matrix*b){

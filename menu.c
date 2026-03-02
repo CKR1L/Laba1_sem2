@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 void display_menu() {
-    printf("\nМЕНЮ ПРОГРАММЫ\n");
+    printf("МЕНЮ ПРОГРАММЫ\n");
     printf("1. Создать первую матрицу\n");
     printf("2. Создать вторую матрицу\n");
     printf("3. Сложение матриц\n");
