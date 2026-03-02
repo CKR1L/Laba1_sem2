@@ -40,38 +40,52 @@ void free_matrix(Matrix*mat){
     free(mat -> data);
     free(mat);   
 }
-void input_matrix(Matrix*mat){
-    if(!mat) return;
-    printf("Введите элементы матрицы размера (%d * %d):\n", mat -> line, mat -> column );
+int input_matrix(Matrix* mat){
+    if(!mat) {
+        printf("Ошибка: матрица не инициализирована!\n");
+        return 1;
+    }
+    printf("Введите элементы матрицы размера (%d * %d):\n", mat->line, mat->column);
     for (int i = 0; i < mat -> line; i++){
         for (int j = 0; j < mat -> column; j++){
             if (mat -> type == 0){
                 printf("mat[%d][%d] int: ", i, j);
-                scanf("%d", &((int**)mat -> data)[i][j]);
-            }else{
+                if (scanf("%d", &((int**)mat->data)[i][j]) != 1) {
+                    printf("Ошибка ввода целого числа!\n");
+                    return 1;
+                }
+            } else {
                 printf("mat[%d][%d] float: ", i, j);
-                scanf("%f", &((float**)mat -> data)[i][j]);
+                if (scanf("%f", &((float**)mat->data)[i][j]) != 1) {
+                    printf("Ошибка ввода вещественного числа!\n");
+                    return 1;
+                }
             }
         }
     }
+    return 0;
 }
 int check_type_matrix(Matrix*a, Matrix*b){
     if(!a||!b) return 0;
     return a -> type == b -> type;
 }
-void print_matrix(Matrix*mat){
-    if(!mat) return;
-    for (int i = 0; i < mat -> line; i++){
+int print_matrix(Matrix* mat){
+    if(!mat) {
+        printf("Ошибка: матрица не инициализирована!\n");
+        return 1;
+    }
+    for (int i = 0; i < mat->line; i++){
         printf("|");
-        for (int j = 0; j < mat -> column; j++){
-            if(mat -> type == 0){
-                printf("%d ", ((int**)mat -> data)[i][j]);
-            }else{
-                printf("%.2f ", ((float**)mat -> data)[i][j]);
+        for (int j = 0; j < mat->column; j++){
+            if(mat->type == 0){
+                printf("%d ", ((int**)mat->data)[i][j]);
+            } else {
+                printf("%.2f ", ((float**)mat->data)[i][j]);
             }
         }
         printf("|\n");
     }
+    return 0;
 }
 Matrix* add_matrices(Matrix*a, Matrix*b){
     if(!a || !b){
@@ -97,7 +111,7 @@ Matrix* add_matrices(Matrix*a, Matrix*b){
             }
         }
     }
-    return result;
+    return result;  
 }
 Matrix* multiplication_matrices(Matrix*a, Matrix*b){
     if(!a || !b){
