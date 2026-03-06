@@ -181,10 +181,11 @@ Matrix*AddLinearCombination(Matrix*mat, int target_line, int line1, int line2, v
         float** float_data = (float**)mat -> data;
         float c1 = *(float*)coeff1;
         float c2 = *(float*)coeff2;
-        printf("Используйте вещественные коэффиценты: %d и %d\n", c1, c2);
+        printf("Используйте вещественные коэффиценты: %f и %f\n", c1, c2);
         for (int j = 0; j < mat -> column; j++){
             float_data[target_line][j] += c1 * float_data[line1][j] + c2 * float_data[line2][j];
         }
     }
     printf("Операция выполнена!\n");
+    return 0;
 }   
