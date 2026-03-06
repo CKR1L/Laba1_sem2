@@ -154,3 +154,37 @@ Matrix*transposition_matrix(Matrix*mat){
     }
     return result;
 }
+Matrix*AddLinearCombination(Matrix*mat, int target_line, int line1, int line2, void* coeff1, void* coeff2){
+    if (!mat){
+        printf("Матрица не иницилизирована\n");
+        return 1;
+    }
+    if (target_line < 0 || target_line >= mat -> line || line1 < 0 || line1 >= mat -> line || line2 < 0 || line2 >= mat -> line ){
+        printf("Ошибка! Неверный индекс строки!\n");
+        return 1;
+    }
+    if (!coeff1 || !coeff2){
+        printf("Коэффиценты не могут быть равны 0\n");
+        return 1;
+    }
+    if (mat -> type == 0){
+        int** int_data = (int**)mat -> data;
+        int c1 = *(int*)coeff1;
+        int c2 = *(int*)coeff2;
+        printf("Используйте целочисленные коэффиценты: %d и %d\n", c1, c2);
+    
+        for (int j = 0; j < mat -> column; j++){
+            int_data[target_line][j] += c1 * int_data[line1][j] + c2 * int_data[line2][j];
+        }  
+    }
+    else{
+        float** float_data = (float**)mat -> data;
+        float c1 = *(float*)coeff1;
+        float c2 = *(float*)coeff2;
+        printf("Используйте вещественные коэффиценты: %d и %d\n", c1, c2);
+        for (int j = 0; j < mat -> column; j++){
+            float_data[target_line][j] += c1 * float_data[line1][j] + c2 * float_data[line2][j];
+        }
+    }
+    printf("Операция выполнена!\n");
+}   
