@@ -31,13 +31,13 @@ Matrix* create_input_matrix() {
     print_matrix(mat);
     return mat;
 }
-int line_combination(Matrix*mat, char matrix_name){
+int line_combination(Matrix*mat, const char* matrix_name){
     if (!mat){
         printf("Матрица не создана\n");
         return 1;
     }
     int target_line, line1, line2;
-    printf("Текущая матрица %s:\n", matrix_name);
+    printf("Текущая матрица %c:\n", matrix_name);
     print_matrix(mat);
     printf("Введите номер целевой строки от (0 - %d)\n", mat -> line - 1);
     if(scanf("%d", &target_line) != 1){

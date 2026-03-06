@@ -12,4 +12,4 @@ int check_type_matrix(Matrix*a, Matrix*b);
 Matrix*add_matrices(Matrix*a, Matrix*b);
 Matrix*multiplication_matrices(Matrix*a, Matrix*b);
 Matrix*transposition_matrix(Matrix*mat);
-Matrix*AddLinearCombination(Matrix*mat, int target_line, int line1, int line2, void* coeff1, void* coeff2);
+int AddLinearCombination(Matrix*mat, int target_line, int line1, int line2, void* coeff1, void* coeff2);

@@ -154,7 +154,7 @@ Matrix*transposition_matrix(Matrix*mat){
     }
     return result;
 }
-Matrix*AddLinearCombination(Matrix*mat, int target_line, int line1, int line2, void* coeff1, void* coeff2){
+int AddLinearCombination(Matrix*mat, int target_line, int line1, int line2, void* coeff1, void* coeff2){
     if (!mat){
         printf("Матрица не иницилизирована\n");
         return 1;
