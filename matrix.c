@@ -122,10 +122,10 @@ Matrix* multiplication_matrices(Matrix*a, Matrix*b){
         printf("Ошибка! Число столбцов первой матрицы должно быть равно числу строк второй матрицы (необходимое условие умножения матриц)");
         return 0;
     }
-    Matrix *result = create_matrix(a -> line, a -> column, a -> type);
+    Matrix *result = create_matrix(a -> line, b -> column, a -> type);
     if(!result) return 0;
     for (int i = 0; i < a -> line; i++){
-        for (int j = 0; j < a -> column; j++){
+        for (int j = 0; j < b -> column; j++){
             if (a -> type == 0){
                 ((int **)result -> data)[i][j] = 0;
                 for (int k = 0; k < a -> column; k++){
@@ -142,7 +142,7 @@ Matrix* multiplication_matrices(Matrix*a, Matrix*b){
     return result;
 }
 Matrix*transposition_matrix(Matrix*mat){
-    Matrix*result = create_matrix(mat -> line, mat -> column, mat -> type);
+    Matrix*result = create_matrix(mat -> column, mat -> line, mat -> type);
     for (int i = 0; i < mat -> line; i++){
         for (int j = 0; j < mat -> column; j++){
             if (mat -> type == 0){

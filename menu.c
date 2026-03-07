@@ -1,6 +1,9 @@
 #include "menu.h"
 #include <stdio.h>
 #include <stdlib.h>
+void test_int_matrix();
+void test_float_matrix();
+void test_linear_combination();
 void display_menu() {
     printf("МЕНЮ ПРОГРАММЫ\n");
     printf("1. Создать первую матрицу\n");
@@ -9,8 +12,9 @@ void display_menu() {
     printf("4. Умножение матриц\n");
     printf("5. Транспонирование первой матрицы\n");
     printf("6. Транспонирование второй матрицы\n");
-    printf("7.Прибавление линейной комбинации в первой матрице\n");
-    printf("8. Выход\n");
+    printf("7.Прибавление линейной комбинации\n");
+    printf("8. Запуск тестов\n");
+    printf("9. Выход\n");
     printf("Выберите действие: ");
 }
 Matrix* create_input_matrix() {
@@ -198,7 +202,13 @@ void menu_choice(int choice, Matrix** mat1, Matrix** mat2) {
                 }
                 line_combination(*mat2, "вторая");
             }
+            break;
         case 8:
+            printf("Запуск тестов\n");
+            run_test();
+            printf("Тесты завершены\n");
+            break;
+        case 9:
             printf("Работа программы завершена\n");
             break;          
         default:
@@ -216,7 +226,7 @@ void run_prog() {
             printf("Ошибка ввода! Введите число.\n");
             continue;
         }
-        if (choice == 7) {
+        if (choice == 9) {
             if (mat1) {
                 free_matrix(mat1);
                 mat1 = NULL;
@@ -229,4 +239,13 @@ void run_prog() {
         }
          menu_choice(choice, &mat1, &mat2);
     }
+}
+void run_test(){
+     printf("\n--- Тестирование целочисленных матриц ---\n");
+    test_int_matrix();
+    printf("\n--- Тестирование вещественных матриц ---\n");
+    test_float_matrix();
+    printf("\n--- Тестирование линейных комбинаций ---\n");
+    test_linear_combination();
+    printf("\nВсе тесты завершены!\n");
 }
