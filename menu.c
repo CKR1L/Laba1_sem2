@@ -1,99 +1,222 @@
 #include "menu.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
 void test_int_matrix();
 void test_float_matrix();
 void test_linear_combination();
+void clear_input_buffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+int safe_input_int(int* value, const char* prompt) {
+    char buffer[100];
+    while (1) {
+        printf("%s", prompt);
+        if (fgets(buffer, sizeof(buffer), stdin)) {
+            int is_valid = 1;
+            int has_digit = 0;
+            for (int i = 0; buffer[i] != '\n' && buffer[i] != '\0'; i++) {
+                if (i == 0 && buffer[i] == '-') continue;
+                if (isdigit(buffer[i])) {
+                    has_digit = 1;
+                } else if (buffer[i] != ' ') { 
+                    is_valid = 0;
+                    break;
+                }
+            }
+            
+            if (is_valid && has_digit && sscanf(buffer, "%d", value) == 1) {
+                return 1;
+            }
+        }
+        printf("Ошибка! Введите целое число (только цифры)\n");
+    }
+}
+int safe_input_float(float* value, const char* prompt) {
+    char buffer[100];
+    while (1) {
+        printf("%s", prompt);
+        if (fgets(buffer, sizeof(buffer), stdin)) {
+            int is_valid = 1;
+            int dot_count = 0;
+            int has_digit = 0;
+            
+            for (int i = 0; buffer[i] != '\n' && buffer[i] != '\0'; i++) {
+                if (i == 0 && buffer[i] == '-') continue;
+                if (buffer[i] == '.') {
+                    dot_count++;
+                    if (dot_count > 1) {
+                        is_valid = 0;
+                        break;
+                    }
+                    continue;
+                }
+                if (isdigit(buffer[i])) {
+                    has_digit = 1;
+                } else if (buffer[i] != ' ') {
+                    is_valid = 0;
+                    break;
+                }
+            }
+            
+            if (is_valid && has_digit && sscanf(buffer, "%f", value) == 1) {
+                return 1;
+            }
+        }
+        printf("Ошибка! Введите вещественное число (только цифры и точку)\n");
+    }
+}
+int safe_input_choice() {
+    char buffer[100];
+    
+    while (1) {
+        if (fgets(buffer, sizeof(buffer), stdin)) {
+            int digit_count = 0;
+            int value = 0;
+            int has_invalid = 0;
+            
+            for (int i = 0; buffer[i] != '\n' && buffer[i] != '\0'; i++) {
+                if (isdigit(buffer[i])) {
+                    digit_count++;
+                    value = value * 10 + (buffer[i] - '0');
+                } else if (buffer[i] != ' ') {
+                    has_invalid = 1;
+                    break;
+                }
+            }
+            
+            if (has_invalid) {
+                printf("Ошибка! Введите только цифру.\n");
+                continue;
+            }
+            
+            if (digit_count == 1) {
+                return value;
+            } else if (digit_count > 1) {
+                printf("Ошибка! Введите только одну цифру.\n");
+            } else {
+                printf("Ошибка! Введите цифру от 1 до 9.\n");
+            }
+        }
+    }
+}
 void display_menu() {
-    printf("МЕНЮ ПРОГРАММЫ\n");
+    printf("\n=== МЕНЮ ПРОГРАММЫ ===\n");
     printf("1. Создать первую матрицу\n");
     printf("2. Создать вторую матрицу\n");
     printf("3. Сложение матриц\n");
     printf("4. Умножение матриц\n");
     printf("5. Транспонирование первой матрицы\n");
     printf("6. Транспонирование второй матрицы\n");
-    printf("7.Прибавление линейной комбинации\n");
+    printf("7. Прибавление линейной комбинации\n");
     printf("8. Запуск тестов\n");
     printf("9. Выход\n");
     printf("Выберите действие: ");
 }
 Matrix* create_input_matrix() {
     int line, column, type;
-    
-    printf("Введите количество строк и столбцов в матрице: ");
-    scanf("%d %d", &line, &column);
-    
-    printf("Выберите тип матрицы (0 - целые числа, 1 - вещественные числа): ");
-    scanf("%d", &type);
+    printf("Создание новой матрицы\n");
+    if (!safe_input_int(&line, "Введите количество строк: ")) {
+        return NULL;
+    }
+    if (line <= 0) {
+        printf("Ошибка! Количество строк должно быть положительным\n");
+        return NULL;
+    }
+    if (!safe_input_int(&column, "Введите количество столбцов: ")) {
+        return NULL;
+    }
+    if (column <= 0) {
+        printf("Ошибка! Количество столбцов должно быть положительным\n");
+        return NULL;
+    }
+    printf("Выберите тип матрицы:\n");
+    printf("0 - целые числа\n");
+    printf("1 - вещественные числа\n");
+    if (!safe_input_int(&type, "Ваш выбор: ")) {
+        return NULL;
+    }
+    if (type != 0 && type != 1) {
+        printf("Неверный тип матрицы. Выберите 0 или 1\n");
+        return NULL;
+    }
     Matrix* mat = create_matrix(line, column, type);
     if (!mat) {
         printf("Ошибка создания матрицы!\n");
         return NULL;
     }
-    input_matrix(mat);
+    if (input_matrix(mat) != 0) {
+        free_matrix(mat);
+        return NULL;
+    }
     printf("\nМатрица создана:\n");
     print_matrix(mat);
     return mat;
 }
-int line_combination(Matrix*mat, const char* matrix_name){
-    if (!mat){
+
+int line_combination(Matrix* mat, const char* matrix_name) {
+    if (!mat) {
         printf("Матрица не создана\n");
         return 1;
     }
     int target_line, line1, line2;
-    printf("Текущая матрица %c:\n", matrix_name);
+    float c1_f, c2_f;
+    int c1_i, c2_i;
+    
+    printf("\nТекущая матрица %s:\n", matrix_name);
     print_matrix(mat);
-    printf("Введите номер целевой строки от (0 - %d)\n", mat -> line - 1);
-    if(scanf("%d", &target_line) != 1){
-        printf("Ошибка ввода!\n");
+    
+    char prompt[100];
+    sprintf(prompt, "Введите номер целевой строки (0 - %d): ", mat->line - 1);
+    if (!safe_input_int(&target_line, prompt)) {
         return 1;
     }
-    printf("Введите номер первой исходной строки от (0 - %d)\n", mat -> line - 1);
-    if(scanf("%d", &line1) != 1){
-        printf("Ошибка ввода\n");
+    
+    sprintf(prompt, "Введите номер первой исходной строки (0 - %d): ", mat->line - 1);
+    if (!safe_input_int(&line1, prompt)) {
         return 1;
     }
-    printf("Введите номер второй исходной строки от (0 - %d)\n", mat -> line - 1);
-    if (scanf("%d", &line2) != 1){
-        printf("Ошибка ввода\n");
+    
+    sprintf(prompt, "Введите номер второй исходной строки (0 - %d): ", mat->line - 1);
+    if (!safe_input_int(&line2, prompt)) {
         return 1;
     }
-    if (mat -> type == 0){
-        int c1, c2;
-        printf("Введите целочисленный коэффицент для первой строки: \n");
-        if (scanf("%d", &c1) != 1){
-            printf("Ошибка ввода\n");
+    if (target_line < 0 || target_line >= mat->line ||
+        line1 < 0 || line1 >= mat->line ||
+        line2 < 0 || line2 >= mat->line) {
+        printf("Ошибка! Индексы строк вне допустимого диапазона.\n");
+        return 1;
+    }
+    if (mat->type == 0) {
+        if (!safe_input_int(&c1_i, "Введите целочисленный коэффициент для первой строки: ")) {
+            return 1;
         }
-        printf("Введите целочисленный коэффицент для второй строки: \n");
-        if (scanf("%d", &c2) != 1){
-            printf("Ошибка ввода\n");
+        if (!safe_input_int(&c2_i, "Введите целочисленный коэффициент для второй строки: ")) {
+            return 1;
         }
-        int result = AddLinearCombination(mat, target_line, line1, line2, &c1, &c2);
-        if (result == 0){
-            printf("Матрица после операции\n", matrix_name);
+        int result = AddLinearCombination(mat, target_line, line1, line2, &c1_i, &c2_i);
+        if (result == 0) {
+            printf("Матрица после операции %s:\n", matrix_name);
             print_matrix(mat);
         }
         return result;
-    }
-    else{
-        float c1, c2;
-        printf("Введите вещественный коэффицент для первой строки: \n");
-        if (scanf("%f", &c1) != 1){
-            printf("Ошибка ввода\n");
+    } else {
+        if (!safe_input_float(&c1_f, "Введите вещественный коэффициент для первой строки: ")) {
+            return 1;
         }
-        printf("Введите вещественный коэффицент для первой строки: \n");
-        if (scanf("%f", &c2) != 1){
-            printf("Ошибка ввода\n");
+        if (!safe_input_float(&c2_f, "Введите вещественный коэффициент для второй строки: ")) {
+            return 1;
         }
-        int result = AddLinearCombination(mat, target_line, line1, line2, &c1, &c2);
-        if (result == 0){
-            printf("Матрица после операции\n", matrix_name);
+        int result = AddLinearCombination(mat, target_line, line1, line2, &c1_f, &c2_f);
+        if (result == 0) {
+            printf("Матрица после операции %s:\n", matrix_name);
             print_matrix(mat);
         }
         return result;
     }
 }
-
 void menu_choice(int choice, Matrix** mat1, Matrix** mat2) {
     Matrix* result = NULL;
     int matrix_choice;
@@ -105,20 +228,19 @@ void menu_choice(int choice, Matrix** mat1, Matrix** mat2) {
                 *mat1 = NULL;
             }
             *mat1 = create_input_matrix();
-            break;  
+            break;           
         case 2:
             if (*mat2) {
                 free_matrix(*mat2);
                 *mat2 = NULL;
             }
             *mat2 = create_input_matrix();
-            break;
+            break;            
         case 3:
             if (!*mat1) {
                 printf("\nПервая матрица не создана. Создайте её:\n");
                 *mat1 = create_input_matrix();
             }
-            
             if (!*mat2) {
                 printf("\nВторая матрица не создана. Создайте её:\n");
                 *mat2 = create_input_matrix();
@@ -131,14 +253,12 @@ void menu_choice(int choice, Matrix** mat1, Matrix** mat2) {
                     free_matrix(result);
                 }
             }
-            break;
-            
+            break;           
         case 4:
             if (!*mat1) {
                 printf("\nПервая матрица не создана. Создайте её:\n");
                 *mat1 = create_input_matrix();
             }
-            
             if (!*mat2) {
                 printf("\nВторая матрица не создана. Создайте её:\n");
                 *mat2 = create_input_matrix();
@@ -151,7 +271,7 @@ void menu_choice(int choice, Matrix** mat1, Matrix** mat2) {
                     free_matrix(result);
                 }
             }
-            break; 
+            break;
         case 5:
             if (!*mat1) {
                 printf("\nПервая матрица не создана. Создайте её:\n");
@@ -165,12 +285,12 @@ void menu_choice(int choice, Matrix** mat1, Matrix** mat2) {
                     free_matrix(result);
                 }
             }
-            break;  
+            break;
         case 6:
             if (!*mat2) {
                 printf("\nВторая матрица не создана. Создайте её:\n");
                 *mat2 = create_input_matrix();
-            }           
+            }
             if (*mat2) {
                 result = transposition_matrix(*mat2);
                 if (result) {
@@ -181,38 +301,42 @@ void menu_choice(int choice, Matrix** mat1, Matrix** mat2) {
             }
             break;
         case 7:
-            printf("Выберите матрицу для операции:\n");
-            printf("Первую матрицу\n");
-            printf("Вторую матрицу");
-            if (scanf("%d", &matrix_choice) !=1){
-                printf("Ошибка ввода\n");
+            printf("\nВыберите матрицу для операции:\n");
+            printf("1 - первую матрицу\n");
+            printf("2 - вторую матрицу\n");
+            if (!safe_input_int(&matrix_choice, "Ваш выбор: ")) {
                 break;
             }
-            if (matrix_choice == 1){
-                if (!*mat1){
+            if (matrix_choice == 1) {
+                if (!*mat1) {
                     printf("Матрица не создана. Создайте её\n");
                     *mat1 = create_input_matrix();
                 }
-                line_combination(*mat1, "первая");
-            }
-            else if(matrix_choice == 2){
-                if (!*mat2){
+                if (*mat1) {
+                    line_combination(*mat1, "первая");
+                }
+            } else if (matrix_choice == 2) {
+                if (!*mat2) {
                     printf("Матрица не создана. Создайте её\n");
                     *mat2 = create_input_matrix();
                 }
-                line_combination(*mat2, "вторая");
+                if (*mat2) {
+                    line_combination(*mat2, "вторая");
+                }
+            } else {
+                printf("Неверный выбор! Введите 1 или 2.\n");
             }
-            break;
+            break;  
         case 8:
-            printf("Запуск тестов\n");
+            printf("\n=== ЗАПУСК ТЕСТОВ ===\n");
             run_test();
-            printf("Тесты завершены\n");
-            break;
+            break;  
         case 9:
             printf("Работа программы завершена\n");
-            break;          
+            break;
+            
         default:
-            printf("Неверный ввод! Введите число от 1 до 7\n");
+            printf("Неверный ввод! Введите число от 1 до 9\n");
     }
 }
 void run_prog() {
@@ -221,11 +345,8 @@ void run_prog() {
     int choice;
     while(1) {
         display_menu();
-        if (scanf("%d", &choice) != 1) {
-            while (getchar() != '\n');
-            printf("Ошибка ввода! Введите число.\n");
-            continue;
-        }
+        choice = safe_input_choice();
+        
         if (choice == 9) {
             if (mat1) {
                 free_matrix(mat1);
@@ -237,15 +358,17 @@ void run_prog() {
             }
             break;
         }
-         menu_choice(choice, &mat1, &mat2);
+        
+        menu_choice(choice, &mat1, &mat2);
     }
 }
-void run_test(){
-     printf("\n--- Тестирование целочисленных матриц ---\n");
+
+void run_test() {
+    printf("\n--- Тестирование целочисленных матриц ---\n");
     test_int_matrix();
     printf("\n--- Тестирование вещественных матриц ---\n");
     test_float_matrix();
     printf("\n--- Тестирование линейных комбинаций ---\n");
     test_linear_combination();
-    printf("\nВсе тесты завершены!\n");
+    printf("\n=== ВСЕ ТЕСТЫ ЗАВЕРШЕНЫ ===\n");
 }
